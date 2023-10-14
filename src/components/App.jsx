@@ -1,64 +1,61 @@
-
-import {Phonebook} from './Phonebook/Phonebook';
-import {Contacts} from './Contacts/Contacts';
-import { nanoid } from 'nanoid';
+import { useDispatch, useSelector } from 'react-redux';
+import { Phonebook } from './Phonebook/Phonebook';
+import { Contacts } from './Contacts/Contacts';
 import { Container, Label } from './App.styled';
-import { useState } from 'react';
+import { getContacts, getFilter } from 'redux/selectors';
+import { deleteContact } from 'redux/contactSlice';
+import { setFilter } from 'redux/filterSlice';
 
-export const App =() => {
-  const [contacts, setContacts] = useState([]);
-  const [filter, setFilter] = useState('');
 
-  //add a new contact to state
-  const onAddContact = data => {
-    if (contacts.some(({ name }) => data.name === name)) {
-      return alert(`${data.name} is already in contacts list`);
-    }
-    const mewContact = { ...data, id: nanoid() };
-    
-    setContacts([...contacts, mewContact]);
-  };
+export const App = () => {
+  
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilter);
 
-  // delete a contact from state
+  
+
+  //! delete a contact from state
   const onDeleteContact = id => {
-    setContacts(contacts.filter(contact => contact.id!== id));
-    
+    dispatch(deleteContact(id));
   };
 
-  // filter contacts by name
-  const onInputChange = e => {
-    setFilter(e.target.value.trim());
-    
+  //! filter contacts by name
+  const onInputChangeFilter = e => {
+    dispatch(setFilter(e.target.value.trim()));
   };
 
-    //filtered contacts by name
-    const filteredContacts = contacts.filter(contact =>
-      contact.name.toLowerCase().includes(filter.toLowerCase())
-    );
-    
-    return (
-      <Container>
-        <Phonebook onAddContact={onAddContact} />
-        <h2>Contacts</h2>
-        {/* show search input if contacts isn't empty */}
-        {contacts.length === 0? (<p>Empty</p>):(
+  //! filtered contacts by name
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
+  );
+  
+
+  return (
+    <Container>
+      <Phonebook />
+      <h2>Contacts</h2>
+      {/* show search input if contacts isn't empty */}
+      {contacts.length === 0 ? (
+        <p>Empty</p>
+      ) : (
         <div>
           <Label>
-          <p>Search by contact</p>
-          <input
-            type="text"
-            placeholder="Enter search contact"
-            value={filter}
-            onChange={onInputChange}
+            <p>Search by contact</p>
+            <input
+              type="text"
+              placeholder="Enter search contact"
+              value={filter}
+              onChange={onInputChangeFilter}
+            />
+          </Label>
+          <Contacts
+         
+            contacts={filteredContacts}
+            onDeleteContact={onDeleteContact}
           />
-        </Label>
-        <Contacts
-          contacts={filteredContacts}
-          onDeleteContact={onDeleteContact}
-        />
-        </div>)}
-        </Container>
-      
-    );
-  
-}
+        </div>
+      )}
+    </Container>
+  );
+};
