@@ -13,14 +13,12 @@ export const App = () => {
   const contacts = useSelector(getContacts);
   const filter = useSelector(getFilter);
 
-  
-
   //! delete a contact from state
   const onDeleteContact = id => {
     dispatch(deleteContact(id));
   };
 
-  //! filter contacts by name
+  //! set filter from input field
   const onInputChangeFilter = e => {
     dispatch(setFilter(e.target.value.trim()));
   };
